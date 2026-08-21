@@ -4,7 +4,6 @@ import BeforeAfterSlider   from './components/BeforeAfterSlider.jsx';
 import ServicesSection     from './components/ServicesSection.jsx';
 import CartSidebar         from './components/CartSidebar.jsx';
 import CheckoutModal       from './components/CheckoutModal.jsx';
-import PreviewModal        from './components/PreviewModal.jsx';
 import PortfolioSection    from './components/PortfolioSection.jsx';
 import { useToast, ToastContainer } from './components/Toast.jsx';
 
@@ -239,12 +238,10 @@ function Footer() {
 ═══════════════════════════════════════════════ */
 export default function App() {
   const [page, setPage] = useState('home');           // 'home' | 'portfolio'
+  const [selectedService, setSelectedService] = useState('geometry');
   const [cartItems, setCartItems] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewItems, setPreviewItems] = useState([]);
-  const [portfolioItems, setPortfolioItems] = useState([]);
   const { toasts, addToast } = useToast();
 
   /* Cart operations */
@@ -267,18 +264,9 @@ export default function App() {
     setCheckoutOpen(true);
   };
 
-  const handleProcessingDone = () => {
-    setPreviewItems([...cartItems]);
+  const handleOrderSuccess = () => {
     setCartItems([]);
-    setPreviewOpen(true);
-    addToast('Pozele sunt gata! Preview disponibil.', 'success');
-  };
-
-  const handlePortfolioAdd = (item) => {
-    setPortfolioItems(prev => {
-      if (prev.some(p => p.id === item.id)) return prev;
-      return [...prev, { ...item, before: item.url, after: item.url, svc: item.svcId, name: item.name }];
-    });
+    addToast('Comanda a fost trimisă cu succes!', 'success');
   };
 
   return (
@@ -293,11 +281,13 @@ export default function App() {
       {page === 'home' && (
         <>
           <Hero onExplore={() => document.getElementById('servicii')?.scrollIntoView({ behavior: 'smooth' })} />
-          <BeforeAfterSlider />
+          <BeforeAfterSlider onSelectService={setSelectedService} />
           <div className="divider" />
           <HowSection />
           <div className="divider" />
           <ServicesSection
+            selectedService={selectedService}
+            onSelectService={setSelectedService}
             onAddToCart={addToCart}
             onOpenCart={() => setCartOpen(true)}
           />
@@ -307,10 +297,7 @@ export default function App() {
       {page === 'portfolio' && (
         <>
           <div style={{ height: 70 }} />
-          <PortfolioSection
-            userItems={portfolioItems}
-            onAddToCart={(items) => { addToCart(items); setPage('home'); setCartOpen(true); }}
-          />
+          <PortfolioSection />
         </>
       )}
 
@@ -331,15 +318,7 @@ export default function App() {
         isOpen={checkoutOpen}
         onClose={() => setCheckoutOpen(false)}
         items={cartItems}
-        onProcessingDone={handleProcessingDone}
-      />
-
-      {/* Preview */}
-      <PreviewModal
-        isOpen={previewOpen}
-        onClose={() => { setPreviewOpen(false); setPage('portfolio'); }}
-        items={previewItems}
-        onPortfolioAdd={handlePortfolioAdd}
+        onOrderSuccess={handleOrderSuccess}
       />
 
       <ToastContainer toasts={toasts} />

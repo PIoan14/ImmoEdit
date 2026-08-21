@@ -44,36 +44,91 @@ export const SERVICES = [
 
 export const SVC_MAP = Object.fromEntries(SERVICES.map(s => [s.id, s]));
 
-// Fake before/after demo pairs  
+// Fake before/after demo pairs matching the 3 services exactly
 export const DEMO_PAIRS = [
   {
-    id: 'living',
-    label: 'Living Room – Corecție Geometrică',
-    before: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=820&q=70',
-    after:  'https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=820&q=70',
+    id: 'geometry',
+    svcId: 'geometry',
+    icon: '📐',
+    label: 'Corecție Geometrică',
+    shortLabel: 'Geometrie',
+    price: '€8 / foto',
+    beforeImg: '/demo/geometry.png',
+    afterImg: '/demo/geometry.png',
+    beforeStyle: {
+      transform: 'perspective(900px) rotateY(-6.5deg) rotateX(4.5deg) scale(1.08) rotate(-1.5deg)',
+      filter: 'contrast(0.95)',
+    },
+    afterStyle: {
+      transform: 'none',
+      filter: 'contrast(1.04)',
+    },
+    beforeBadges: [
+      '❌ Distorsiune Perspectivă (-6.5°)',
+      '❌ Linii Verticale Înclinat/Strâmbe',
+      '❌ Orizont Ne-nivelat (-1.5°)',
+    ],
+    afterBadges: [
+      '✓ Linii Verticale 90° Perfect Drept',
+      '✓ Corecție Perspectivă Keystone (0.0°)',
+      '✓ Nivel Orizont & Distorsiune Aliniată',
+    ],
+    desc: 'Corectăm milimetric pereții înclinați, liniile strâmbe ale ferestrelor și distorsiunea de perspectivă produsă de camerele de telefon.',
   },
   {
-    id: 'exterior',
-    label: 'Exterior – Transformare Cer',
-    before: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=820&q=70',
-    after:  'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=820&q=70',
+    id: 'nature',
+    svcId: 'nature',
+    icon: '🌤️',
+    label: 'Transformare Natură',
+    shortLabel: 'Natură',
+    price: '€12 / foto',
+    beforeImg: '/demo/nature.png',
+    afterImg: '/demo/nature.png',
+    beforeStyle: {
+      filter: 'brightness(0.82) contrast(0.9) saturate(0.42) hue-rotate(15deg)',
+    },
+    afterStyle: {
+      filter: 'brightness(1.08) contrast(1.05) saturate(1.3)',
+    },
+    beforeBadges: [
+      '❌ Cer Înnorat / Gri Apăsător',
+      '❌ Gazon & Iarbă Mată / Uscată',
+      '❌ Ambient Plat - Fără Umbre Calde',
+    ],
+    afterBadges: [
+      '✓ Cer Albastru Însorit (Sky Replacement)',
+      '✓ Gazon & Copaci Verde Intens',
+      '✓ Iluminare Exterioară Naturală',
+    ],
+    desc: 'Înlocuim cerul gri înnorat cu un cer senin de vară, intensificăm verdeața gazonului și oferim luminozitate naturală exterioară.',
   },
   {
-    id: 'bedroom',
-    label: 'Dormitor – Editor Uman',
-    before: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=820&q=70',
-    after:  'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=820&q=70',
+    id: 'human',
+    svcId: 'human',
+    icon: '✏️',
+    label: 'Editor Uman',
+    shortLabel: 'Editor',
+    price: '€20 / foto',
+    beforeImg: '/demo/human.png',
+    afterImg: '/demo/human.png',
+    beforeStyle: {
+      filter: 'sepia(0.28) hue-rotate(-22deg) contrast(1.18) brightness(0.85)',
+    },
+    afterStyle: {
+      filter: 'brightness(1.04) contrast(1.02) saturate(1.1)',
+    },
+    beforeBadges: [
+      '❌ Geamuri Arse (Alb Fără Vedere)',
+      '❌ Dominantă Galbenă de Bec',
+      '❌ Umbre Întunecate & Detalii Pierdute',
+    ],
+    afterBadges: [
+      '✓ Vedere Geamuri Recuperată (HDR Window Pull)',
+      '✓ Retuș Manual Cabluri & Detalii',
+      '✓ Balanță de Alb & Luminozitate Naturală',
+    ],
+    desc: 'Un editor foto imobiliar profesionist preia poza ta și efectuează un retuș manual amănunțit: HDR window pull, eliminare cabluri și balanță perfectă de alb.',
   },
-];
-
-// Fake portfolio items for demo
-export const DEMO_PORTFOLIO = [
-  { id: 'p1', name: 'Ap. Herastrau – Living', svc: 'geometry',  before: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=60', after: 'https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=400&q=60' },
-  { id: 'p2', name: 'Vila Pipera – Exterior', svc: 'nature',    before: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=60', after: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&q=60' },
-  { id: 'p3', name: 'Penthouse Floreasca',   svc: 'human',     before: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&q=60', after: 'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=400&q=60' },
-  { id: 'p4', name: 'Casa Snagov – Dormitor',svc: 'geometry',  before: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=400&q=60', after: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&q=60' },
-  { id: 'p5', name: 'Apartament Dorobanți',  svc: 'nature',    before: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&q=60', after: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&q=60' },
-  { id: 'p6', name: 'Loft Victoriei – Bucătărie', svc: 'human', before: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&q=60', after: 'https://images.unsplash.com/photo-1600489000022-c2086d79f9d4?w=400&q=60' },
 ];
 
 export const HOW_STEPS = [
@@ -82,3 +137,4 @@ export const HOW_STEPS = [
   { num: '3', title: 'Plătești & aștepți', desc: 'Procesare rapidă 24-48h. Primești notificare pe email când sunt gata.' },
   { num: '4', title: 'Aprobi sau respingi', desc: 'Preview protejat cu like/dislike. O regenerare gratuită garantată.' },
 ];
+

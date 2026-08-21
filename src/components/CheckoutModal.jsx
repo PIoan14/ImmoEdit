@@ -7,48 +7,100 @@ const PROCESSING_STEPS = [
   { id: 'ai',      label: 'Se aplică corecțiile AI…' },
   { id: 'review',  label: 'Verificare calitate finală…' },
   { id: 'cloud',   label: 'Se stochează în Google Cloud (7 zile)…' },
-  { id: 'done',    label: 'Gata! Preview disponibil.' },
+  { id: 'send',    label: 'Se finalizează trimiterea…' },
 ];
 
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 /**
- * CheckoutModal – multi-step: info form → summary → processing → done.
- * After "processing" completes it calls onProcessingDone to open preview.
+ * CheckoutModal – multi-step: info form → summary → processing → result.
+ * The processing animation always plays out, but the result step (success
+ * or failure) reflects the actual outcome of the POST to the local server.
  */
-export default function CheckoutModal({ isOpen, onClose, items, onProcessingDone }) {
-  const [step, setStep] = useState(1); // 1=form, 2=summary, 3=processing, 4=done
+export default function CheckoutModal({ isOpen, onClose, items, onOrderSuccess }) {
+  const [step, setStep] = useState(1); // 1=form, 2=summary, 3=processing, 4=result
   const [procStep, setProcStep] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
   const [form, setForm] = useState({ name: '', email: '', phone: '', notes: '' });
 
   const total = items.reduce((s, it) => s + (SVC_MAP[it.svcId]?.price || 0), 0);
 
   // Reset on open
   useEffect(() => {
-    if (isOpen) { setStep(1); setProcStep(0); }
+    if (isOpen) { setStep(1); setProcStep(0); setError(null); }
   }, [isOpen]);
 
-  // Animate processing steps
+  // Cosmetic step-by-step reveal while the real request is in flight
   useEffect(() => {
     if (step !== 3) return;
     let i = 0;
     const timer = setInterval(() => {
       i++;
-      setProcStep(i);
-      if (i >= PROCESSING_STEPS.length) {
-        clearInterval(timer);
-        setStep(4);
-        setTimeout(() => {
-          onClose();
-          onProcessingDone();
-        }, 1200);
-      }
+      if (i < PROCESSING_STEPS.length) setProcStep(i);
+      else clearInterval(timer);
     }, 900);
     return () => clearInterval(timer);
-  }, [step, onClose, onProcessingDone]);
+  }, [step]);
 
-  const handlePay = () => {
-    if (!form.name || !form.email) return;
+  const handlePay = async () => {
+    if (!form.name || !form.email || submitting) return;
+    setSubmitting(true);
+    setError(null);
     setStep(3);
-    console.log('[ImmoEdit Checkout] Plată inițiată:', { ...form, items: items.map(i => ({ name: i.name, svc: i.svcId })), total });
+    setProcStep(0);
+
+    const minDuration = new Promise(res => setTimeout(res, PROCESSING_STEPS.length * 900));
+
+    try {
+      const pictures = await Promise.all(items.map(async it => ({
+        price: SVC_MAP[it.svcId]?.price || 0,
+        task: it.svcId,
+        picture_content: await fileToBase64(it.file),
+      })));
+
+      console.log("Here")
+      const request = fetch('http://localhost:8001/ReceiveNest', {
+        method: 'POST',
+        headers: { accept: 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          date: new Date().toISOString().slice(0, 10),
+          pictures,
+          total_price: total,
+        }),
+      }).then(res => {
+        if (!res.ok) throw new Error(`Server a răspuns cu status ${res.status}`);
+      });
+
+      await Promise.all([request, minDuration]);
+      setStep(4);
+      onOrderSuccess();
+    } catch (error) {
+      await minDuration;
+
+      console.log("Error :" + error)
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'A apărut o eroare necunoscută.'
+      );
+      //setError('Trimiterea comenzii a eșuat. Verifică conexiunea și încearcă din nou.');
+      setStep(4);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleRetry = () => {
+    setError(null);
+    setStep(2);
   };
 
   if (!isOpen) return null;
@@ -61,9 +113,9 @@ export default function CheckoutModal({ isOpen, onClose, items, onProcessingDone
             {step === 1 && '📋 Datele Tale'}
             {step === 2 && '🧾 Sumar Comandă'}
             {step === 3 && '⏳ Se Procesează…'}
-            {step === 4 && '✅ Comandă Plasată!'}
+            {step === 4 && (error ? '❌ Comandă Eșuată' : '✅ Comandă Trimisă!')}
           </span>
-          {step < 3 && <button id="checkout-modal-close" className="modal-close" onClick={onClose}>✕</button>}
+          {!submitting && <button id="checkout-modal-close" className="modal-close" onClick={onClose}>✕</button>}
         </div>
 
         <div className="modal-body">
@@ -127,8 +179,8 @@ export default function CheckoutModal({ isOpen, onClose, items, onProcessingDone
               </div>
               <div className="flex-row" style={{ justifyContent: 'space-between' }}>
                 <button id="checkout-back" className="btn-secondary" onClick={() => setStep(1)}>← Înapoi</button>
-                <button id="checkout-pay" className="btn-primary" onClick={handlePay}>
-                  💳 Plătește €{total.toFixed(2)}
+                <button id="checkout-pay" className="btn-primary" disabled={submitting} onClick={handlePay}>
+                  {submitting ? '⏳ Se trimite…' : `💳 Plătește €${total.toFixed(2)}`}
                 </button>
               </div>
             </>
@@ -153,12 +205,24 @@ export default function CheckoutModal({ isOpen, onClose, items, onProcessingDone
             </div>
           )}
 
-          {/* Step 4 – Done flash */}
-          {step === 4 && (
+          {/* Step 4 – Result: success or failure */}
+          {step === 4 && !error && (
             <div className="processing-anim">
               <div className="success-icon-wrap" style={{ margin: '0 auto var(--gap-md)' }}>✅</div>
-              <div className="processing-title">Procesare completă!</div>
-              <div className="processing-desc">Se deschide preview-ul…</div>
+              <div className="processing-title">Comanda a fost trimisă cu succes!</div>
+              <div className="processing-desc">Te contactăm pe email când pozele sunt gata.</div>
+              <div className="flex-row mt-sm" style={{ justifyContent: 'center' }}>
+                <button id="checkout-done-close" className="btn-primary" onClick={onClose}>Închide</button>
+              </div>
+            </div>
+          )}
+          {step === 4 && error && (
+            <div className="processing-anim">
+              <div className="success-icon-wrap" style={{ margin: '0 auto var(--gap-md)', background: 'rgba(232,110,110,0.12)', border: '1px solid rgba(232,110,110,0.3)' }}>❌</div>
+              <div className="processing-title">{error}</div>
+              <div className="flex-row mt-sm" style={{ justifyContent: 'center' }}>
+                <button id="checkout-retry" className="btn-primary" onClick={handleRetry}>Încearcă din nou</button>
+              </div>
             </div>
           )}
         </div>

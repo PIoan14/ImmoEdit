@@ -5,8 +5,13 @@ import { SERVICES, SVC_MAP } from '../data.js';
  * ServicesSection – three service cards + upload panel per service.
  * Uploaded files are accumulated into a shared cart array via onAddToCart.
  */
-export default function ServicesSection({ onAddToCart, onOpenCart }) {
-  const [activeService, setActiveService] = useState('geometry');
+export default function ServicesSection({ onAddToCart, onOpenCart, selectedService = 'geometry', onSelectService }) {
+  const [localService, setLocalService] = useState('geometry');
+  const activeService = selectedService || localService;
+  const setActiveService = (svcId) => {
+    setLocalService(svcId);
+    if (onSelectService) onSelectService(svcId);
+  };
   const [files, setFiles] = useState({}); // { serviceId: [{ id, file, url, name }] }
   const [drag, setDrag] = useState(false);
   const inputRef = useRef(null);
