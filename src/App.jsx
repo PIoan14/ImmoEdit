@@ -106,7 +106,7 @@ function Hero({ onExplore }) {
       <div className="hero-content">
         <div className="hero-badge">
           <span className="badge-dot" />
-          Stage 1 POC · Agenți Imobiliari
+          Platformă AI · Agenți Imobiliari
         </div>
 
         <h1 className="hero-title">
@@ -147,6 +147,12 @@ function Hero({ onExplore }) {
           </div>
         </div>
       </div>
+
+      <button
+        className="hero-scroll-cue"
+        aria-label="Derulează în jos"
+        onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
+      />
     </section>
   );
 }
@@ -234,6 +240,61 @@ function Footer() {
 }
 
 /* ═══════════════════════════════════════════════
+   TEMP TEST BUTTON (remove later)
+═══════════════════════════════════════════════ */
+function TestFetchButton() {
+  const [imageUrl, setImageUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleTest = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('http://localhost:8000/test', {
+        headers: { accept: 'application/json' }
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      setImageUrl(prev => {
+        if (prev) URL.revokeObjectURL(prev);
+        return URL.createObjectURL(blob);
+      });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ padding: '2rem', textAlign: 'center', borderTop: '2px dashed #999' }}>
+      <button
+        id="test-fetch-btn"
+        onClick={handleTest}
+        disabled={loading}
+        style={{ padding: '0.6rem 1.2rem', cursor: 'pointer', fontSize: '0.9rem' }}
+      >
+        {loading ? 'Se încarcă...' : '🧪 Test /test'}
+      </button>
+      {error && <p style={{ color: 'red', marginTop: '0.5rem' }}>Eroare: {error}</p>}
+      {imageUrl && (
+        <div style={{ marginTop: '1rem' }}>
+          <img src={imageUrl} alt="Test response" style={{ maxWidth: '100%', maxHeight: 400, display: 'block', margin: '0 auto' }} />
+          <a
+            href={imageUrl}
+            download="test-image.png"
+            style={{ display: 'inline-block', marginTop: '0.75rem', fontSize: '0.9rem' }}
+          >
+            ⬇ Descarcă imaginea
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════
    APP ROOT
 ═══════════════════════════════════════════════ */
 export default function App() {
@@ -302,6 +363,9 @@ export default function App() {
       )}
 
       <Footer />
+
+      {/* TEMP: test fetch button — remove later */}
+      <TestFetchButton />
 
       {/* Cart */}
       <CartSidebar

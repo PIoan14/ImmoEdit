@@ -13,7 +13,8 @@ const PROCESSING_STEPS = [
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
+    // reader.result is "data:<mime>;base64,<data>" — strip the prefix, keep only raw base64
+    reader.onload = () => resolve(reader.result.split(',')[1]);
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
@@ -29,7 +30,7 @@ export default function CheckoutModal({ isOpen, onClose, items, onOrderSuccess }
   const [procStep, setProcStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [form, setForm] = useState({ name: '', email: '', phone: '', notes: '' });
+  const [form, setForm] = useState({ email: '' });
 
   const total = items.reduce((s, it) => s + (SVC_MAP[it.svcId]?.price || 0), 0);
 
@@ -51,7 +52,7 @@ export default function CheckoutModal({ isOpen, onClose, items, onOrderSuccess }
   }, [step]);
 
   const handlePay = async () => {
-    if (!form.name || !form.email || submitting) return;
+    if (!form.email || submitting) return;
     setSubmitting(true);
     setError(null);
     setStep(3);
@@ -63,15 +64,18 @@ export default function CheckoutModal({ isOpen, onClose, items, onOrderSuccess }
       const pictures = await Promise.all(items.map(async it => ({
         price: SVC_MAP[it.svcId]?.price || 0,
         task: it.svcId,
+        filename: it.file.name,
+        content_type: it.file.type || 'image/jpeg',
         picture_content: await fileToBase64(it.file),
       })));
 
       console.log("Here")
-      const request = fetch('http://localhost:8001/ReceiveNest', {
+      const request = fetch('http://localhost:8000/ReceiveNest', {
         method: 'POST',
         headers: { accept: 'application/json', 'Content-Type': 'application/json' },
         body: JSON.stringify({
           date: new Date().toISOString().slice(0, 10),
+          email: form.email,
           pictures,
           total_price: total,
         }),
@@ -131,26 +135,12 @@ export default function CheckoutModal({ isOpen, onClose, items, onOrderSuccess }
           {/* Step 1 – Form */}
           {step === 1 && (
             <div className="checkout-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Nume complet *</label>
-                  <input id="checkout-name" className="form-input" placeholder="Ion Popescu" value={form.name} onChange={e => setForm(p => ({...p, name: e.target.value}))} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Telefon</label>
-                  <input id="checkout-phone" className="form-input" placeholder="+40 721 000 000" value={form.phone} onChange={e => setForm(p => ({...p, phone: e.target.value}))} />
-                </div>
-              </div>
               <div className="form-group">
                 <label className="form-label">Email *</label>
                 <input id="checkout-email" className="form-input" type="email" placeholder="ion@agentie.ro" value={form.email} onChange={e => setForm(p => ({...p, email: e.target.value}))} />
               </div>
-              <div className="form-group">
-                <label className="form-label">Observații (opțional)</label>
-                <input id="checkout-notes" className="form-input" placeholder="Ex: fara lumina flash, stil minimalist…" value={form.notes} onChange={e => setForm(p => ({...p, notes: e.target.value}))} />
-              </div>
               <div className="flex-row mt-sm" style={{ justifyContent: 'flex-end' }}>
-                <button id="checkout-next" className="btn-primary" disabled={!form.name || !form.email} onClick={() => setStep(2)}>
+                <button id="checkout-next" className="btn-primary" disabled={!form.email} onClick={() => setStep(2)}>
                   Continuă →
                 </button>
               </div>

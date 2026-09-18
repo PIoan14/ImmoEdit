@@ -162,6 +162,7 @@ export default function BeforeAfterSlider({ onSelectService }) {
         </div>
 
         {/* Feature Highlights Grid below slider */}
+        {/* <div><img src="https://storage.cloud.google.com/original_pictures/dummy?authuser=1" alt="Descriere imagine"></img></div> */}
         <div className="demo-features-footer">
           <div className="demo-feature-card">
             <div className="df-icon">🎯</div>
