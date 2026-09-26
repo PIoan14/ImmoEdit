@@ -83,82 +83,111 @@ export default function BeforeAfterSlider({ onSelectService }) {
           ))}
         </div>
 
-        {/* Slider Box */}
-        <div className="ba-container-outer">
-          <div
-            id="ba-slider"
-            className="ba-wrapper"
-            ref={wrapRef}
-            onMouseDown={(e) => { dragging.current = true; handleMove(e.clientX); }}
-            onTouchStart={(e) => { dragging.current = true; handleMove(e.touches[0].clientX); }}
-          >
-            {/* Before View (Original / Unedited layer) */}
-            <div className="ba-layer before-layer">
-              <img
-                src={pair.beforeImg}
-                alt="Înainte de editare"
-                className="ba-img"
-                style={pair.beforeStyle}
-                draggable={false}
-              />
-              {/* Additional SVG sky or window overlays for before state if needed */}
-              {pair.svcId === 'nature' && (
-                <div className="demo-overcast-overlay" />
-              )}
-              {pair.svcId === 'human' && (
-                <div className="demo-blown-windows-overlay" />
-              )}
-            </div>
-
-            {/* After View (Clipped layer) */}
+        <div className="ba-stage">
+          {/* Slider Box */}
+          <div className="ba-container-outer">
             <div
-              className="ba-layer after-layer"
-              style={{ clipPath: `inset(0 0 0 ${pos}%)` }}
+              id="ba-slider"
+              className="ba-wrapper"
+              ref={wrapRef}
+              onMouseDown={(e) => { dragging.current = true; handleMove(e.clientX); }}
+              onTouchStart={(e) => { dragging.current = true; handleMove(e.touches[0].clientX); }}
             >
-              <img
-                src={pair.afterImg}
-                alt="După editare"
-                className="ba-img"
-                style={pair.afterStyle}
-                draggable={false}
-              />
-              {pair.svcId === 'nature' && (
-                <div className="demo-sunny-sky-overlay" />
-              )}
-            </div>
-
-            {/* Visual Guide Grid Overlay */}
-            {showGrid && (
-              <div className="ba-grid-overlay">
-                <div className="grid-line v-line-1" />
-                <div className="grid-line v-line-2" />
-                <div className="grid-line h-line-1" />
-                <div className="grid-line h-line-2" />
-                <span className="grid-tag">ALINIERE PERSPECTIVĂ & GRID</span>
+              {/* Before View (Original / Unedited layer) */}
+              <div className="ba-layer before-layer">
+                <img
+                  src={pair.beforeImg}
+                  alt="Înainte de editare"
+                  className="ba-img"
+                  style={pair.beforeStyle}
+                  draggable={false}
+                />
+                {/* Additional SVG sky or window overlays for before state if needed */}
+                {pair.svcId === 'nature' && (
+                  <div className="demo-overcast-overlay" />
+                )}
+                {pair.svcId === 'human' && (
+                  <div className="demo-blown-windows-overlay" />
+                )}
               </div>
-            )}
 
-            {/* Divider Line & Handle */}
-            <div className="ba-line" style={{ left: `${pos}%` }} />
-            <div className="ba-handle" style={{ left: `${pos}%` }}>
-              <span>‹</span><span>›</span>
-            </div>
+              {/* After View (Clipped layer) */}
+              <div
+                className="ba-layer after-layer"
+                style={{ clipPath: `inset(0 0 0 ${pos}%)` }}
+              >
+                <img
+                  src={pair.afterImg}
+                  alt="După editare"
+                  className="ba-img"
+                  style={pair.afterStyle}
+                  draggable={false}
+                />
+                {pair.svcId === 'nature' && (
+                  <div className="demo-sunny-sky-overlay" />
+                )}
+              </div>
 
-            {/* Floating Side Badges */}
-            <div className="ba-floating-badges before">
-              <span className="ba-label before-tag">ÎNAINTE (Brut)</span>
-              {pair.beforeBadges.map((b, idx) => (
-                <span key={idx} className="badge-item issue">{b}</span>
-              ))}
-            </div>
+              {/* Visual Guide Grid Overlay */}
+              {showGrid && (
+                <div className="ba-grid-overlay">
+                  <div className="grid-line v-line-1" />
+                  <div className="grid-line v-line-2" />
+                  <div className="grid-line h-line-1" />
+                  <div className="grid-line h-line-2" />
+                  <span className="grid-tag">ALINIERE PERSPECTIVĂ & GRID</span>
+                </div>
+              )}
 
-            <div className="ba-floating-badges after" style={{ opacity: pos > 15 ? 1 : 0.2 }}>
-              <span className="ba-label after-tag">DUPĂ ({pair.shortLabel})</span>
-              {pair.afterBadges.map((b, idx) => (
-                <span key={idx} className="badge-item fix">{b}</span>
-              ))}
+              {/* Divider Line & Handle */}
+              <div className="ba-line" style={{ left: `${pos}%` }} />
+              <div className="ba-handle" style={{ left: `${pos}%` }}>
+                <span>‹</span><span>›</span>
+              </div>
+
+              {/* Floating Side Badges */}
+              <div className="ba-floating-badges before">
+                <span className="ba-label before-tag">ÎNAINTE (Brut)</span>
+                {pair.beforeBadges.map((b, idx) => (
+                  <span key={idx} className="badge-item issue">{b}</span>
+                ))}
+              </div>
+
+              <div className="ba-floating-badges after" style={{ opacity: pos > 15 ? 1 : 0.2 }}>
+                <span className="ba-label after-tag">DUPĂ ({pair.shortLabel})</span>
+                {pair.afterBadges.map((b, idx) => (
+                  <span key={idx} className="badge-item fix">{b}</span>
+                ))}
+              </div>
             </div>
           </div>
+
+          {/* Active service info panel */}
+          <aside className="demo-svc-banner ba-side">
+            <div className="demo-svc-badge">
+              <span className="ba-side-icon">{pair.icon}</span>
+              <span>{pair.label}</span>
+              <span className="demo-price-pill">{pair.price}</span>
+            </div>
+            <p className="demo-svc-desc">{pair.desc}</p>
+
+            <div className="ba-side-title">Ce primești</div>
+            <ul className="ba-side-list">
+              {(svcInfo.features || []).map(f => <li key={f}>{f}</li>)}
+            </ul>
+
+            <div className="demo-actions-row ba-side-actions">
+              <button id="demo-select-service" className="btn-primary btn-sm" onClick={handleSelectServiceClick}>
+                Alege acest serviciu →
+              </button>
+              {pair.svcId === 'geometry' && (
+                <button id="demo-toggle-grid" className="btn-secondary btn-sm" onClick={() => setShowGrid(g => !g)}>
+                  {showGrid ? 'Ascunde grila' : '📏 Arată grila'}
+                </button>
+              )}
+            </div>
+            <div className="ba-side-hint">↔ Trage de slider pentru a compara</div>
+          </aside>
         </div>
 
         {/* Feature Highlights Grid below slider */}
