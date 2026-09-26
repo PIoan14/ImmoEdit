@@ -67,14 +67,14 @@ export default function CheckoutModal({ isOpen, onClose, items, onOrderSuccess }
         filename: it.file.name,
         content_type: it.file.type || 'image/jpeg',
         picture_content: await fileToBase64(it.file),
+        twin_content : ""
       })));
 
       console.log("Here")
-      const request = fetch('http://localhost:8000/ReceiveNest', {
+      const request = fetch('http://localhost:8003/ReceiveNest', {
         method: 'POST',
         headers: { accept: 'application/json', 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          date: new Date().toISOString().slice(0, 10),
           email: form.email,
           pictures,
           total_price: total,

@@ -5,6 +5,7 @@ import ServicesSection     from './components/ServicesSection.jsx';
 import CartSidebar         from './components/CartSidebar.jsx';
 import CheckoutModal       from './components/CheckoutModal.jsx';
 import PortfolioSection    from './components/PortfolioSection.jsx';
+import ReceivedPhotosSection from './components/ReceivedPhotosSection.jsx';
 import { useToast, ToastContainer } from './components/Toast.jsx';
 
 /* ═══════════════════════════════════════════════
@@ -24,11 +25,12 @@ function Navbar({ cartCount, onOpenCart, onNav, activePage }) {
     { id: 'demo',      label: '▶ Demo',       page: 'home',  section: 'demo' },
     { id: 'servicii',  label: '⚙ Servicii',   page: 'home',  section: 'servicii' },
     { id: 'portofoliu',label: '📸 Portofoliu', page: 'portfolio', section: null },
+    { id: 'primite',   label: '📥 Fotografii primite', page: 'received', section: null },
   ];
 
   const handleNav = (link) => {
     setMenuOpen(false);
-    if (link.page === 'portfolio') { onNav('portfolio'); return; }
+    if (!link.section) { onNav(link.page); window.scrollTo({ top: 0 }); return; }
     onNav('home');
     setTimeout(() => document.getElementById(link.section)?.scrollIntoView({ behavior: 'smooth' }), 50);
   };
@@ -251,7 +253,7 @@ function TestFetchButton() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('http://localhost:8000/test', {
+      const res = await fetch('http://localhost:800/getProducts', {
         headers: { accept: 'application/json' }
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -298,7 +300,7 @@ function TestFetchButton() {
    APP ROOT
 ═══════════════════════════════════════════════ */
 export default function App() {
-  const [page, setPage] = useState('home');           // 'home' | 'portfolio'
+  const [page, setPage] = useState('home');           // 'home' | 'portfolio' | 'received'
   const [selectedService, setSelectedService] = useState('geometry');
   const [cartItems, setCartItems] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
@@ -359,6 +361,13 @@ export default function App() {
         <>
           <div style={{ height: 70 }} />
           <PortfolioSection />
+        </>
+      )}
+
+      {page === 'received' && (
+        <>
+          <div style={{ height: 70 }} />
+          <ReceivedPhotosSection onToast={addToast} />
         </>
       )}
 
