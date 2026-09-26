@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
-import { SERVICES, HOW_STEPS } from './data.js';
+import { SERVICES, HOW_STEPS, DEMO_PAIRS } from './data.js';
 import BeforeAfterSlider   from './components/BeforeAfterSlider.jsx';
 import ServicesSection     from './components/ServicesSection.jsx';
 import CartSidebar         from './components/CartSidebar.jsx';
 import CheckoutModal       from './components/CheckoutModal.jsx';
-import PortfolioSection    from './components/PortfolioSection.jsx';
 import ReceivedPhotosSection from './components/ReceivedPhotosSection.jsx';
 import { useToast, ToastContainer } from './components/Toast.jsx';
 
@@ -24,7 +23,6 @@ function Navbar({ cartCount, onOpenCart, onNav, activePage }) {
   const navLinks = [
     { id: 'demo',      label: '▶ Demo',       page: 'home',  section: 'demo' },
     { id: 'servicii',  label: '⚙ Servicii',   page: 'home',  section: 'servicii' },
-    { id: 'portofoliu',label: '📸 Portofoliu', page: 'portfolio', section: null },
     { id: 'primite',   label: '📥 Fotografii primite', page: 'received', section: null },
   ];
 
@@ -93,6 +91,57 @@ function Navbar({ cartCount, onOpenCart, onNav, activePage }) {
 }
 
 /* ═══════════════════════════════════════════════
+   HERO PREVIEW – fanned "hand" of demo photos (front card links to demo)
+═══════════════════════════════════════════════ */
+function HeroPreview() {
+  const pair = DEMO_PAIRS.find(p => p.svcId === 'nature') || DEMO_PAIRS[0];
+  const sidePairs = DEMO_PAIRS.filter(p => p.id !== pair.id).slice(0, 2);
+  const goToDemo = () => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
+
+  return (
+    <div className="hero-visual">
+      <div className="hero-hand">
+        {sidePairs.map((p, i) => (
+          <div key={p.id} className={`hero-card hero-card-side ${i === 0 ? 'left' : 'right'}`} aria-hidden="true">
+            <span className="hero-preview-img">
+              <img src={p.afterImg} alt="" style={p.afterStyle} draggable={false} />
+            </span>
+            <span className="hero-preview-caption">
+              <span>{p.icon} {p.label}</span>
+            </span>
+          </div>
+        ))}
+
+        <button type="button" className="hero-card hero-preview" onClick={goToDemo} aria-label="Vezi demo înainte și după">
+          <span className="hero-preview-img">
+            <span className="hero-preview-layer">
+              <img src={pair.beforeImg} alt="" style={pair.beforeStyle} draggable={false} />
+              <span className="demo-overcast-overlay" />
+            </span>
+            <span className="hero-preview-layer after">
+              <img src={pair.afterImg} alt="" style={pair.afterStyle} draggable={false} />
+              <span className="demo-sunny-sky-overlay" />
+            </span>
+            <span className="hero-preview-divider" />
+            <span className="ba-label before-tag hero-preview-tag left">ÎNAINTE</span>
+            <span className="ba-label after-tag hero-preview-tag right">DUPĂ</span>
+          </span>
+          <span className="hero-preview-caption">
+            <span>{pair.icon} {pair.label}</span>
+            <span className="hero-preview-price">{pair.price}</span>
+          </span>
+        </button>
+      </div>
+
+      <div className="hero-chips">
+        <span className="hero-chip">☀ Cer înlocuit automat</span>
+        <span className="hero-chip">⚡ Livrare în 24h</span>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════
    HERO
 ═══════════════════════════════════════════════ */
 function Hero({ onExplore }) {
@@ -105,49 +154,59 @@ function Hero({ onExplore }) {
       </div>
       <div className="hero-grid" />
 
-      <div className="hero-content">
-        <div className="hero-badge">
-          <span className="badge-dot" />
-          Platformă AI · Agenți Imobiliari
+      <div className="container hero-layout">
+        <div className="hero-content">
+          <div className="hero-badge">
+            <span className="badge-dot" />
+            Platformă AI · Agenți Imobiliari
+          </div>
+
+          <h1 className="hero-title">
+            Fotografii Imobiliare<br />
+            <span>Transformate Profesional</span>
+          </h1>
+
+          <p className="hero-subtitle">
+            Corectăm perspectiva, transformăm cerul, retuș manual de expert.
+            Upload rapid, rezultate premium — de pe telefonul tău.
+          </p>
+
+          <div className="hero-actions">
+            <button id="hero-cta-upload" className="hero-btn-primary" onClick={onExplore}>
+              📷 Încarcă Pozele
+            </button>
+            <button id="hero-cta-demo" className="hero-btn-secondary" onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}>
+              ▶ Vezi Demo
+            </button>
+          </div>
+
+          <ul className="hero-trust">
+            <li>✓ Plată doar per fotografie</li>
+            <li>✓ Regenerare gratuită</li>
+            <li>✓ Protejat GDPR</li>
+          </ul>
+
+          <div className="hero-stats">
+            <div>
+              <div className="stat-num">3</div>
+              <div className="stat-lbl">Servicii</div>
+            </div>
+            <div>
+              <div className="stat-num">24h</div>
+              <div className="stat-lbl">Livrare</div>
+            </div>
+            <div>
+              <div className="stat-num">7 zile</div>
+              <div className="stat-lbl">Stocare Cloud</div>
+            </div>
+            <div>
+              <div className="stat-num">100%</div>
+              <div className="stat-lbl">Satisfacție</div>
+            </div>
+          </div>
         </div>
 
-        <h1 className="hero-title">
-          Fotografii Imobiliare<br />
-          <span>Transformate Profesional</span>
-        </h1>
-
-        <p className="hero-subtitle">
-          Corectăm perspectiva, transformăm cerul, retuș manual de expert.
-          Upload rapid, rezultate premium — de pe telefonul tău.
-        </p>
-
-        <div className="hero-actions">
-          <button id="hero-cta-upload" className="hero-btn-primary" onClick={onExplore}>
-            📷 Încarcă Pozele
-          </button>
-          <button id="hero-cta-demo" className="hero-btn-secondary" onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}>
-            ▶ Vezi Demo
-          </button>
-        </div>
-
-        <div className="hero-stats">
-          <div>
-            <div className="stat-num">3</div>
-            <div className="stat-lbl">Servicii</div>
-          </div>
-          <div>
-            <div className="stat-num">24h</div>
-            <div className="stat-lbl">Livrare</div>
-          </div>
-          <div>
-            <div className="stat-num">7 zile</div>
-            <div className="stat-lbl">Stocare Cloud</div>
-          </div>
-          <div>
-            <div className="stat-num">100%</div>
-            <div className="stat-lbl">Satisfacție</div>
-          </div>
-        </div>
+        <HeroPreview />
       </div>
 
       <button
@@ -213,7 +272,6 @@ function Footer() {
             <div className="footer-col-title">Platformă</div>
             <ul className="footer-links">
               <li><a href="#demo">Demo Live</a></li>
-              <li><a href="#portofoliu">Portofoliu</a></li>
               <li><a href="#cum-functioneaza">Cum Funcționează</a></li>
               <li><a href="#acasa">Prețuri</a></li>
             </ul>
@@ -300,7 +358,7 @@ function TestFetchButton() {
    APP ROOT
 ═══════════════════════════════════════════════ */
 export default function App() {
-  const [page, setPage] = useState('home');           // 'home' | 'portfolio' | 'received'
+  const [page, setPage] = useState('home');           // 'home' | 'received'
   const [selectedService, setSelectedService] = useState('geometry');
   const [cartItems, setCartItems] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
@@ -354,13 +412,6 @@ export default function App() {
             onAddToCart={addToCart}
             onOpenCart={() => setCartOpen(true)}
           />
-        </>
-      )}
-
-      {page === 'portfolio' && (
-        <>
-          <div style={{ height: 70 }} />
-          <PortfolioSection />
         </>
       )}
 
