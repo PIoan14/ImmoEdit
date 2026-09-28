@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { SERVICES, SVC_MAP } from '../data.js';
+import ServiceDecor, { SectionDecor } from './ServiceDecor.jsx';
 
 /**
  * ServicesSection – three service cards + upload panel per service.
@@ -54,6 +55,7 @@ export default function ServicesSection({ onAddToCart, onOpenCart, selectedServi
 
   return (
     <section className="services-section" id="servicii">
+      <SectionDecor layout="b" />
       <div className="container">
         <div className="section-header">
           <div className="section-tag">Servicii</div>
@@ -74,6 +76,7 @@ export default function ServicesSection({ onAddToCart, onOpenCart, selectedServi
               className={`service-card ${s.cardClass} ${activeService === s.id ? 'active' : ''}`}
               onClick={() => setActiveService(s.id)}
             >
+              <ServiceDecor svcId={s.id} />
               <span className={`svc-badge ${s.badge}`}>{s.badgeText}</span>
               <div className={`svc-icon ${s.cardClass}`}>{s.icon}</div>
               <div className="svc-title">{s.label}</div>

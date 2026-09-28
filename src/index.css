@@ -743,7 +743,7 @@ body {
 /* ══════════════════════════════════════════
    SERVICES SECTION
 ══════════════════════════════════════════ */
-.services-section { padding: var(--gap-2xl) 0; background: var(--color-bg); }
+.services-section { padding: var(--gap-2xl) 0; background: var(--color-bg); position: relative; overflow: hidden; }
 .services-grid {
   display: grid; grid-template-columns: repeat(3,1fr); gap: var(--gap-md);
   margin-bottom: var(--gap-xl);
@@ -771,6 +771,44 @@ body {
 }
 .service-card.active { border-color: rgba(184,131,79,0.45); box-shadow: var(--shadow-card), 0 0 0 3px rgba(196,145,92,0.12); }
 .service-card.active::before, .service-card:hover::before { opacity: 1; }
+
+/* Same illustrations scattered across the Demo / Servicii section backgrounds */
+.ba-section { position: relative; overflow: hidden; }
+.section-decor { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.ba-section > .container, .services-section > .container { position: relative; z-index: 1; }
+.section-decor-piece {
+  position: absolute; width: clamp(220px, 30vw, 420px); opacity: 0.2;
+  -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent 100%);
+          mask-image: radial-gradient(closest-side, #000 55%, transparent 100%);
+}
+.section-decor-piece svg { display: block; width: 100%; height: auto; }
+.section-decor-piece.pos-tl { top: 2%;  left: -4%;  transform: rotate(-8deg); }
+.section-decor-piece.pos-tr { top: 2%;  right: -4%; transform: rotate(7deg); }
+.section-decor-piece.pos-ml { top: 42%; left: -8%;  transform: rotate(6deg); }
+.section-decor-piece.pos-mr { top: 38%; right: -8%; transform: rotate(-6deg); }
+.section-decor-piece.pos-bl { bottom: 2%; left: -3%;  transform: rotate(5deg); }
+.section-decor-piece.pos-br { bottom: 2%; right: -3%; transform: rotate(-5deg); }
+@media(max-width:768px) {
+  .section-decor-piece { width: 240px; opacity: 0.17; }
+  .section-decor-piece.pos-ml, .section-decor-piece.pos-mr { top: 45%; }
+}
+
+/* Themed background illustration per service */
+.svc-decor {
+  position: absolute; right: -16px; bottom: -12px; width: 78%; max-width: 300px;
+  pointer-events: none; z-index: 0;
+  opacity: 0.16; transform: rotate(-3deg);
+  transition: opacity var(--transition), transform var(--transition-slow);
+  -webkit-mask-image: linear-gradient(to top left, #000 45%, transparent 95%);
+          mask-image: linear-gradient(to top left, #000 45%, transparent 95%);
+}
+.svc-decor svg { display: block; width: 100%; height: auto; }
+.svc-decor-geometry { color: var(--gold-1); }
+.svc-decor-nature   { color: var(--teal-1); }
+.svc-decor-human    { color: #8457b3; }
+.service-card:hover .svc-decor, .service-card.active .svc-decor { opacity: 0.3; transform: rotate(0deg) scale(1.04); }
+.service-card > :not(.svc-decor):not(.svc-badge) { position: relative; z-index: 1; }
+.svc-badge { z-index: 2; }
 
 .svc-icon {
   width: 56px; height: 56px; border-radius: var(--radius-md);

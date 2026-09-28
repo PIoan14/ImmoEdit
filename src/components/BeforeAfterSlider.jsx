@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { DEMO_PAIRS, SVC_MAP } from '../data.js';
+import { SectionDecor } from './ServiceDecor.jsx';
 
 /**
  * Interactive Before/After comparison slider demonstrating the 3 exact backend services.
@@ -51,6 +52,7 @@ export default function BeforeAfterSlider({ onSelectService }) {
 
   return (
     <section className="ba-section" id="demo">
+      <SectionDecor layout="a" />
       <div className="container">
         {/* Section Header */}
         <div className="section-header">
