@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { unzip } from '../utils/unzip.js';
 
-const API_BASE = 'http://localhost:8003';
-
 /**
  * ReceivedPhotosSection – the client enters their order code and sees the edited
  * photos returned by the server. Each photo can be liked/disliked, downloaded,
@@ -32,7 +30,7 @@ export default function ReceivedPhotosSection({ onToast }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}/getProducts?code=${encodeURIComponent(code)}`, {
+      const res = await fetch(`${import.meta.env.API_BASE}/getProducts?code=${encodeURIComponent(code)}`, {
         headers: { accept: 'application/zip' }
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

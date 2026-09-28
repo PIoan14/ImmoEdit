@@ -70,8 +70,8 @@ export default function CheckoutModal({ isOpen, onClose, items, onOrderSuccess }
         twin_content : ""
       })));
 
-      console.log("Here")
-      const request = fetch('http://localhost:8003/ReceiveNest', {
+    
+      const request = fetch(`${import.meta.env.API_BASE}/ReceiveNest`, {
         method: 'POST',
         headers: { accept: 'application/json', 'Content-Type': 'application/json' },
         body: JSON.stringify({

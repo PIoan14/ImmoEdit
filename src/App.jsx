@@ -311,7 +311,11 @@ function TestFetchButton() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('http://localhost:800/getProducts', {
+
+      API_BASE = "https://surprising-youth-production-f4c6.up.railway.app"
+      console.log("URL")
+      console.log(import.meta.env.API_BASE)
+      const res = await fetch(`${API_BASE}/getProducts`, {
         headers: { accept: 'application/json' }
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
