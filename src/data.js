@@ -63,16 +63,6 @@ export const DEMO_PAIRS = [
       transform: 'none',
       filter: 'contrast(1.04)',
     },
-    beforeBadges: [
-      '❌ Distorsiune Perspectivă (-6.5°)',
-      '❌ Linii Verticale Înclinat/Strâmbe',
-      '❌ Orizont Ne-nivelat (-1.5°)',
-    ],
-    afterBadges: [
-      '✓ Linii Verticale 90° Perfect Drept',
-      '✓ Corecție Perspectivă Keystone (0.0°)',
-      '✓ Nivel Orizont & Distorsiune Aliniată',
-    ],
     desc: 'Corectăm milimetric pereții înclinați, liniile strâmbe ale ferestrelor și distorsiunea de perspectivă produsă de camerele de telefon.',
   },
   {
@@ -90,16 +80,6 @@ export const DEMO_PAIRS = [
     afterStyle: {
       filter: 'brightness(1.08) contrast(1.05) saturate(1.3)',
     },
-    beforeBadges: [
-      '❌ Cer Înnorat / Gri Apăsător',
-      '❌ Gazon & Iarbă Mată / Uscată',
-      '❌ Ambient Plat - Fără Umbre Calde',
-    ],
-    afterBadges: [
-      '✓ Cer Albastru Însorit (Sky Replacement)',
-      '✓ Gazon & Copaci Verde Intens',
-      '✓ Iluminare Exterioară Naturală',
-    ],
     desc: 'Înlocuim cerul gri înnorat cu un cer senin de vară, intensificăm verdeața gazonului și oferim luminozitate naturală exterioară.',
   },
   {
@@ -117,16 +97,6 @@ export const DEMO_PAIRS = [
     afterStyle: {
       filter: 'brightness(1.04) contrast(1.02) saturate(1.1)',
     },
-    beforeBadges: [
-      '❌ Geamuri Arse (Alb Fără Vedere)',
-      '❌ Dominantă Galbenă de Bec',
-      '❌ Umbre Întunecate & Detalii Pierdute',
-    ],
-    afterBadges: [
-      '✓ Vedere Geamuri Recuperată (HDR Window Pull)',
-      '✓ Retuș Manual Cabluri & Detalii',
-      '✓ Balanță de Alb & Luminozitate Naturală',
-    ],
     desc: 'Un editor foto imobiliar profesionist preia poza ta și efectuează un retuș manual amănunțit: HDR window pull, eliminare cabluri și balanță perfectă de alb.',
   },
 ];

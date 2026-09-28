@@ -22,13 +22,13 @@ function Navbar({ cartCount, onOpenCart, onNav, activePage }) {
 
   const navLinks = [
     { id: 'demo',      label: '▶ Demo',       page: 'home',  section: 'demo' },
-    { id: 'servicii',  label: '⚙ Servicii',   page: 'home',  section: 'servicii' },
+    { id: 'servicii',  label: '⚙ Servicii',   page: 'servicii', section: null },
     { id: 'primite',   label: '📥 Fotografii primite', page: 'received', section: null },
   ];
 
   const handleNav = (link) => {
     setMenuOpen(false);
-    if (!link.section) { onNav(link.page); window.scrollTo({ top: 0 }); return; }
+    if (!link.section) { onNav(link.page); return; }
     onNav('home');
     setTimeout(() => document.getElementById(link.section)?.scrollIntoView({ behavior: 'smooth' }), 50);
   };
@@ -61,7 +61,7 @@ function Navbar({ cartCount, onOpenCart, onNav, activePage }) {
               🛒 Coș
               {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
             </button>
-            <button id="nav-cta" className="btn-primary" onClick={() => { onNav('home'); setTimeout(() => document.getElementById('servicii')?.scrollIntoView({ behavior: 'smooth' }), 50); }}>
+            <button id="nav-cta" className="btn-primary" onClick={() => onNav('servicii')}>
               Încarcă Acum
             </button>
             <button
@@ -82,6 +82,9 @@ function Navbar({ cartCount, onOpenCart, onNav, activePage }) {
             {link.label}
           </button>
         ))}
+        <button id="mob-cta" className="btn-primary w-full" onClick={() => { setMenuOpen(false); onNav('servicii'); }}>
+          Încarcă Acum
+        </button>
         <button id="mob-cart" className="cart-btn w-full" style={{ justifyContent: 'center' }} onClick={() => { setMenuOpen(false); onOpenCart(); }}>
           🛒 Coș {cartCount > 0 && `(${cartCount})`}
         </button>
@@ -247,7 +250,13 @@ function HowSection() {
 /* ═══════════════════════════════════════════════
    FOOTER
 ═══════════════════════════════════════════════ */
-function Footer() {
+function Footer({ onNav }) {
+  const go = (page, section) => (e) => {
+    e.preventDefault();
+    onNav(page);
+    if (section) setTimeout(() => document.getElementById(section)?.scrollIntoView({ behavior: 'smooth' }), 50);
+  };
+
   return (
     <footer className="footer">
       <div className="container">
@@ -265,15 +274,15 @@ function Footer() {
           <div>
             <div className="footer-col-title">Servicii</div>
             <ul className="footer-links">
-              {SERVICES.map(s => <li key={s.id}><a href="#servicii">{s.icon} {s.label}</a></li>)}
+              {SERVICES.map(s => <li key={s.id}><a href="#servicii" onClick={go('servicii')}>{s.icon} {s.label}</a></li>)}
             </ul>
           </div>
           <div>
             <div className="footer-col-title">Platformă</div>
             <ul className="footer-links">
-              <li><a href="#demo">Demo Live</a></li>
-              <li><a href="#cum-functioneaza">Cum Funcționează</a></li>
-              <li><a href="#acasa">Prețuri</a></li>
+              <li><a href="#demo" onClick={go('home', 'demo')}>Demo Live</a></li>
+              <li><a href="#cum-functioneaza" onClick={go('home', 'cum-functioneaza')}>Cum Funcționează</a></li>
+              <li><a href="#servicii" onClick={go('servicii')}>Prețuri</a></li>
             </ul>
           </div>
           <div>
@@ -300,74 +309,25 @@ function Footer() {
 }
 
 /* ═══════════════════════════════════════════════
-   TEMP TEST BUTTON (remove later)
-═══════════════════════════════════════════════ */
-function TestFetchButton() {
-  const [imageUrl, setImageUrl] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const handleTest = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-
-      API_BASE = "https://surprising-youth-production-f4c6.up.railway.app"
-      console.log("URL")
-      console.log(import.meta.env.API_BASE)
-      const res = await fetch(`${API_BASE}/getProducts`, {
-        headers: { accept: 'application/json' }
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const blob = await res.blob();
-      setImageUrl(prev => {
-        if (prev) URL.revokeObjectURL(prev);
-        return URL.createObjectURL(blob);
-      });
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div style={{ padding: '2rem', textAlign: 'center', borderTop: '2px dashed #999' }}>
-      <button
-        id="test-fetch-btn"
-        onClick={handleTest}
-        disabled={loading}
-        style={{ padding: '0.6rem 1.2rem', cursor: 'pointer', fontSize: '0.9rem' }}
-      >
-        {loading ? 'Se încarcă...' : '🧪 Test /test'}
-      </button>
-      {error && <p style={{ color: 'red', marginTop: '0.5rem' }}>Eroare: {error}</p>}
-      {imageUrl && (
-        <div style={{ marginTop: '1rem' }}>
-          <img src={imageUrl} alt="Test response" style={{ maxWidth: '100%', maxHeight: 400, display: 'block', margin: '0 auto' }} />
-          <a
-            href={imageUrl}
-            download="test-image.png"
-            style={{ display: 'inline-block', marginTop: '0.75rem', fontSize: '0.9rem' }}
-          >
-            ⬇ Descarcă imaginea
-          </a>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════
    APP ROOT
 ═══════════════════════════════════════════════ */
 export default function App() {
-  const [page, setPage] = useState('home');           // 'home' | 'received'
+  const [page, setPage] = useState('home');           // 'home' | 'servicii' | 'received'
   const [selectedService, setSelectedService] = useState('geometry');
   const [cartItems, setCartItems] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const { toasts, addToast } = useToast();
+
+  const goToPage = (next) => {
+    setPage(next);
+    window.scrollTo({ top: 0 });
+  };
+
+  const chooseService = (svcId) => {
+    setSelectedService(svcId);
+    goToPage('servicii');
+  };
 
   /* Cart operations */
   const addToCart = (items) => {
@@ -399,17 +359,22 @@ export default function App() {
       <Navbar
         cartCount={cartItems.length}
         onOpenCart={() => setCartOpen(true)}
-        onNav={setPage}
+        onNav={goToPage}
         activePage={page}
       />
 
       {page === 'home' && (
         <>
-          <Hero onExplore={() => document.getElementById('servicii')?.scrollIntoView({ behavior: 'smooth' })} />
-          <BeforeAfterSlider onSelectService={setSelectedService} />
+          <Hero onExplore={() => goToPage('servicii')} />
+          <BeforeAfterSlider onSelectService={chooseService} />
           <div className="divider" />
           <HowSection />
-          <div className="divider" />
+        </>
+      )}
+
+      {page === 'servicii' && (
+        <>
+          <div style={{ height: 70 }} />
           <ServicesSection
             selectedService={selectedService}
             onSelectService={setSelectedService}
@@ -426,10 +391,7 @@ export default function App() {
         </>
       )}
 
-      <Footer />
-
-      {/* TEMP: test fetch button — remove later */}
-      <TestFetchButton />
+      <Footer onNav={goToPage} />
 
       {/* Cart */}
       <CartSidebar

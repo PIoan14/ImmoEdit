@@ -47,10 +47,6 @@ export default function BeforeAfterSlider({ onSelectService }) {
     if (onSelectService) {
       onSelectService(pair.svcId);
     }
-    const el = document.getElementById('servicii');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
   };
 
   return (
@@ -63,7 +59,7 @@ export default function BeforeAfterSlider({ onSelectService }) {
             Transformare <span>Înainte &amp; După</span>
           </h2>
           <p className="section-desc">
-            Alege unul din cele 3 servicii de mai jos și trage slider-ul pentru a vedea exact ce transformări aplică fiecare serviciu pe fotografiile tăle.
+            Alege unul din cele 3 servicii și trage slider-ul pentru a vedea exact ce transformări aplică fiecare serviciu pe fotografiile tăle.
           </p>
         </div>
 
@@ -148,16 +144,10 @@ export default function BeforeAfterSlider({ onSelectService }) {
               {/* Floating Side Badges */}
               <div className="ba-floating-badges before">
                 <span className="ba-label before-tag">ÎNAINTE (Brut)</span>
-                {pair.beforeBadges.map((b, idx) => (
-                  <span key={idx} className="badge-item issue">{b}</span>
-                ))}
               </div>
 
               <div className="ba-floating-badges after" style={{ opacity: pos > 15 ? 1 : 0.2 }}>
                 <span className="ba-label after-tag">DUPĂ ({pair.shortLabel})</span>
-                {pair.afterBadges.map((b, idx) => (
-                  <span key={idx} className="badge-item fix">{b}</span>
-                ))}
               </div>
             </div>
           </div>
