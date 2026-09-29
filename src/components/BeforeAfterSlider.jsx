@@ -186,18 +186,24 @@ export default function BeforeAfterSlider({ onSelectService }) {
         {/* <div><img src="https://storage.cloud.google.com/original_pictures/dummy?authuser=1" alt="Descriere imagine"></img></div> */}
         <div className="demo-features-footer">
           <div className="demo-feature-card">
-            <div className="df-icon">🎯</div>
-            <div className="df-title">Rezultat Specific Serviciului</div>
+            <div className="df-head">
+              <div className="df-icon">🎯</div>
+              <div className="df-title">Rezultat Specific Serviciului</div>
+            </div>
             <div className="df-desc">Fiecare fotografie este procesată exact conform algoritmului sau instrucțiunilor serviciului selectat ({pair.label}).</div>
           </div>
           <div className="demo-feature-card">
-            <div className="df-icon">⚡</div>
-            <div className="df-title">Procesare 24-48 Ore</div>
+            <div className="df-head">
+              <div className="df-icon">⚡</div>
+              <div className="df-title">Procesare 24-48 Ore</div>
+            </div>
             <div className="df-desc">Livrare rapidă direct în contul tău și în Google Cloud cu link protejat de descarcare.</div>
           </div>
           <div className="demo-feature-card">
-            <div className="df-icon">🛡️</div>
-            <div className="df-title">Garanție de Satisfacție</div>
+            <div className="df-head">
+              <div className="df-icon">🛡️</div>
+              <div className="df-title">Garanție de Satisfacție</div>
+            </div>
             <div className="df-desc">O regenerare gratuită garantată sau retuș suplimentar de la editorul uman dacă dorești ajustări.</div>
           </div>
         </div>

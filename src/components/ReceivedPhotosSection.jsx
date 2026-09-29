@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { unzip } from '../utils/unzip.js';
+import { SectionDecor } from './ServiceDecor.jsx';
 
 /**
  * ReceivedPhotosSection – the client enters their order code and sees the edited
@@ -88,6 +89,7 @@ export default function ReceivedPhotosSection({ onToast }) {
 
   return (
     <section className="received-section" id="fotografii-primite">
+      <SectionDecor layout="c" />
       <div className="container">
         <div className="section-header">
           <div className="section-tag">Fotografii primite</div>
@@ -152,10 +154,14 @@ export default function ReceivedPhotosSection({ onToast }) {
 
                   <div className="received-card-body">
                     <div className="received-media">
-                      <a className="received-img-wrap" href={photo.url} target="_blank" rel="noreferrer" title="Deschide la dimensiune completă">
-                        <img src={photo.url} alt={`Fotografie editată ${idx + 1}`} className="received-img" />
-                        <span className="received-zoom">⤢ Mărește</span>
-                      </a>
+                      <div className="received-frame">
+                        <a className="received-img-wrap" href={photo.url} target="_blank" rel="noreferrer" title="Deschide la dimensiune completă">
+                          <img src={photo.url} alt="" aria-hidden="true" className="received-img-bg" />
+                          <img src={photo.url} alt={`Fotografie editată ${idx + 1}`} className="received-img" />
+                          <span className="received-img-tag">✦ Editată profesional</span>
+                          <span className="received-zoom">⤢ Mărește</span>
+                        </a>
+                      </div>
 
                       <div className="received-toolbar">
                         <div className="reaction-group">
@@ -189,24 +195,20 @@ export default function ReceivedPhotosSection({ onToast }) {
                         <span className="received-comments-count">{photo.comments.length}</span>
                       </div>
 
-                      <div className="received-comment-list">
-                        {photo.comments.length === 0 ? (
-                          <div className="received-comment-empty">
-                            Nicio observație încă. Spune-ne ce ai dori să modificăm.
-                          </div>
-                        ) : (
-                          photo.comments.map((c, i) => (
+                      {photo.comments.length > 0 && (
+                        <div className="received-comment-list">
+                          {photo.comments.map((c, i) => (
                             <div key={i} className="received-comment">
                               <div className="received-comment-text">{c.text}</div>
                               <div className="received-comment-time">
                                 {c.at.toLocaleString('ro-RO', { dateStyle: 'short', timeStyle: 'short' })}
                               </div>
                             </div>
-                          ))
-                        )}
-                      </div>
+                          ))}
+                        </div>
+                      )}
 
-                      <div className="received-composer">
+                      <div className={`received-composer ${photo.comments.length === 0 ? 'solo' : ''}`}>
                         <textarea
                           className="form-input received-textarea"
                           placeholder="Ex: cerul puțin mai luminos, îndreaptă linia acoperișului..."

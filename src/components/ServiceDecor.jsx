@@ -135,7 +135,83 @@ function HumanDecor() {
   );
 }
 
-const DECORS = { geometry: GeometryDecor, nature: NatureDecor, human: HumanDecor };
+function PhotosDecor() {
+  return (
+    <svg viewBox="0 0 240 200" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+      {/* stacked prints */}
+      <g strokeWidth="1.5">
+        <g transform="rotate(-12 80 100)">
+          <rect x="30" y="50" width="100" height="90" rx="3" />
+          <rect x="38" y="58" width="84" height="62" rx="1" />
+        </g>
+        <g transform="rotate(6 110 100)">
+          <rect x="60" y="45" width="100" height="90" rx="3" />
+          <rect x="68" y="53" width="84" height="62" rx="1" />
+          {/* house inside the front print */}
+          <path d="M85 108 L85 88 L102 76 L119 88 L119 108 Z M97 108 L97 97 L107 97 L107 108" strokeWidth="1.2" />
+          <path d="M122 108 L134 90 L146 108" strokeWidth="1.1" />
+          <circle cx="138" cy="68" r="5" strokeWidth="1.1" />
+        </g>
+      </g>
+      {/* camera */}
+      <g strokeWidth="1.5">
+        <rect x="160" y="140" width="66" height="44" rx="6" />
+        <path d="M178 140 L184 130 L202 130 L208 140" />
+        <circle cx="193" cy="162" r="13" />
+        <circle cx="193" cy="162" r="6" strokeWidth="1.1" />
+        <line x1="216" y1="148" x2="220" y2="148" />
+      </g>
+      {/* focus corners */}
+      <g strokeWidth="1.2">
+        <path d="M180 20 L180 32 M180 20 L192 20" />
+        <path d="M228 20 L216 20 M228 20 L228 32" />
+        <path d="M180 76 L180 64 M180 76 L192 76" />
+        <path d="M228 76 L216 76 M228 76 L228 64" />
+        <circle cx="204" cy="48" r="3" />
+      </g>
+      {/* sparkles */}
+      <g strokeWidth="1.3">
+        <path d="M24 170 L24 186 M16 178 L32 178" />
+        <path d="M140 170 L140 180 M135 175 L145 175" />
+      </g>
+    </svg>
+  );
+}
+
+function CloudDecor() {
+  return (
+    <svg viewBox="0 0 240 200" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+      {/* cloud */}
+      <path d="M60 110 C38 110 30 90 44 78 C42 58 66 48 80 60 C88 36 126 32 138 58 C160 50 180 66 174 86 C194 90 192 112 172 112 Z" strokeWidth="1.7" />
+      {/* download arrow */}
+      <g strokeWidth="1.8">
+        <line x1="110" y1="80" x2="110" y2="150" />
+        <path d="M94 134 L110 150 L126 134" />
+        <path d="M84 168 L136 168" />
+      </g>
+      {/* dotted transfer trail */}
+      <g strokeWidth="1" strokeDasharray="2 5" opacity="0.8">
+        <path d="M30 150 C50 130 70 160 90 140" />
+        <path d="M130 140 C150 160 175 130 205 150" />
+      </g>
+      {/* checkmark badge */}
+      <g strokeWidth="1.5">
+        <circle cx="196" cy="40" r="16" />
+        <path d="M188 40 L194 46 L205 34" />
+      </g>
+      {/* hearts / likes */}
+      <path d="M36 40 C36 32 46 30 48 38 C50 30 60 32 60 40 C60 48 48 54 48 56 C48 54 36 48 36 40 Z" strokeWidth="1.3" />
+      <path d="M200 180 C200 175 206 174 207 179 C208 174 214 175 214 180 C214 185 207 189 207 190 C207 189 200 185 200 180 Z" strokeWidth="1.1" />
+      {/* sparkles */}
+      <g strokeWidth="1.3">
+        <path d="M24 100 L24 112 M18 106 L30 106" />
+        <path d="M160 180 L160 190 M155 185 L165 185" />
+      </g>
+    </svg>
+  );
+}
+
+const DECORS = { geometry: GeometryDecor, nature: NatureDecor, human: HumanDecor, photos: PhotosDecor, cloud: CloudDecor };
 
 export default function ServiceDecor({ svcId }) {
   const Decor = DECORS[svcId];
@@ -162,6 +238,18 @@ const SECTION_PIECES = {
     { svcId: 'geometry', pos: 'ml' },
     { svcId: 'human',    pos: 'br' },
   ],
+  c: [
+    { svcId: 'photos',   pos: 'tl' },
+    { svcId: 'cloud',    pos: 'tr' },
+    { svcId: 'human',    pos: 'ul' },
+    { svcId: 'nature',   pos: 'ur' },
+    { svcId: 'geometry', pos: 'ml' },
+    { svcId: 'photos',   pos: 'mr' },
+    { svcId: 'cloud',    pos: 'll' },
+    { svcId: 'human',    pos: 'lr' },
+    { svcId: 'nature',   pos: 'bl' },
+    { svcId: 'geometry', pos: 'br' },
+  ],
 };
 
 export function SectionDecor({ layout = 'a' }) {
@@ -170,7 +258,7 @@ export function SectionDecor({ layout = 'a' }) {
       {SECTION_PIECES[layout].map(({ svcId, pos }) => {
         const Decor = DECORS[svcId];
         return (
-          <div key={svcId} className={`section-decor-piece pos-${pos} svc-decor-${svcId}`}>
+          <div key={pos} className={`section-decor-piece pos-${pos} svc-decor-${svcId}`}>
             <Decor />
           </div>
         );

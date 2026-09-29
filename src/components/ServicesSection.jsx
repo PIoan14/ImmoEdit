@@ -75,14 +75,24 @@ export default function ServicesSection({ onAddToCart, onOpenCart, selectedServi
               id={`svc-card-${s.id}`}
               className={`service-card ${s.cardClass} ${activeService === s.id ? 'active' : ''}`}
               onClick={() => setActiveService(s.id)}
+              role="radio"
+              aria-checked={activeService === s.id}
             >
               <ServiceDecor svcId={s.id} />
               <span className={`svc-badge ${s.badge}`}>{s.badgeText}</span>
               <div className={`svc-icon ${s.cardClass}`}>{s.icon}</div>
               <div className="svc-title">{s.label}</div>
               <div className="svc-desc">{s.desc}</div>
-              <div className="svc-price">{s.priceLabel}</div>
-              <div className="svc-price-sub">per fotografie editată</div>
+              <div className="svc-footer">
+                <div>
+                  <div className="svc-price">{s.priceLabel}</div>
+                  <div className="svc-price-sub">per fotografie editată</div>
+                </div>
+                <span className="svc-select" aria-hidden="true">
+                  <span className="svc-select-box">{activeService === s.id ? '✓' : ''}</span>
+                  {activeService === s.id ? 'Selectat' : 'Alege'}
+                </span>
+              </div>
             </div>
           ))}
         </div>
