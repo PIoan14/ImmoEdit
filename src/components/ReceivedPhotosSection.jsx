@@ -5,7 +5,7 @@ import { SectionDecor } from './ServiceDecor.jsx';
 /**
  * ReceivedPhotosSection – the client enters their order code and sees the edited
  * photos returned by the server. Each photo can be liked/disliked, downloaded,
- * commented on and sent back for another round of editing.
+ * given a single observation and sent back for another round of editing.
  *
  * /getProducts?code=... returns a ZIP archive with all photos, which is
  * unpacked in the browser. Feedback / resend have no endpoint yet, so they
@@ -49,8 +49,9 @@ export default function ReceivedPhotosSection({ onToast }) {
           name: file.name,
           url,
           reaction: null,        // 'like' | 'dislike' | null
-          comments: [],
+          note: null,            // the single observation: { text, at } | null
           draft: '',
+          editing: false,        // true while the sent observation is being edited
           resent: false,
         };
       }));
@@ -68,19 +69,26 @@ export default function ReceivedPhotosSection({ onToast }) {
   const toggleReaction = (id, reaction) =>
     updatePhoto(id, p => ({ reaction: p.reaction === reaction ? null : reaction }));
 
-  const addComment = (id) =>
+  // Only one observation per photo – it can be edited until the photo is resent.
+  const saveNote = (id) =>
     updatePhoto(id, p => {
       const text = p.draft.trim();
       if (!text) return {};
-      return { comments: [...p.comments, { text, at: new Date() }], draft: '' };
+      return { note: { text, at: new Date(), edited: !!p.note }, draft: '', editing: false };
     });
+
+  const startEdit = (id) =>
+    updatePhoto(id, p => ({ editing: true, draft: p.note?.text ?? '' }));
+
+  const cancelEdit = (id) =>
+    updatePhoto(id, { editing: false, draft: '' });
 
   const resend = (id) => {
     updatePhoto(id, p => {
       const text = p.draft.trim();
       return {
         resent: true,
-        comments: text ? [...p.comments, { text, at: new Date() }] : p.comments,
+        note: p.note ?? (text ? { text, at: new Date() } : null),
         draft: '',
       };
     });
@@ -142,101 +150,129 @@ export default function ReceivedPhotosSection({ onToast }) {
                       : { cls: 'new',      label: '● Nouă' };
 
                 return (
-                <article key={photo.id} className="received-card">
-                  <header className="received-card-head">
-                    <div className="received-card-num">{String(idx + 1).padStart(2, '0')}</div>
-                    <div className="received-card-heading">
-                      <div className="received-card-title">Fotografia {idx + 1} din {photos.length}</div>
-                      <div className="received-card-file">{photo.name}</div>
+                <div key={photo.id} className="received-item">
+                  <article className="received-card">
+                    <div className="received-frame">
+                      <a className="received-img-wrap" href={photo.url} target="_blank" rel="noreferrer" title="Deschide la dimensiune completă">
+                        <img src={photo.url} alt="" aria-hidden="true" className="received-img-bg" />
+                        <img src={photo.url} alt={`Fotografie editată ${idx + 1}`} className="received-img" />
+                        <span className="received-img-tag">✦ Editată profesional</span>
+                        <span className="received-zoom">⤢ Mărește</span>
+                      </a>
                     </div>
-                    <span className={`received-status ${status.cls}`}>{status.label}</span>
-                  </header>
+                  </article>
 
-                  <div className="received-card-body">
-                    <div className="received-media">
-                      <div className="received-frame">
-                        <a className="received-img-wrap" href={photo.url} target="_blank" rel="noreferrer" title="Deschide la dimensiune completă">
-                          <img src={photo.url} alt="" aria-hidden="true" className="received-img-bg" />
-                          <img src={photo.url} alt={`Fotografie editată ${idx + 1}`} className="received-img" />
-                          <span className="received-img-tag">✦ Editată profesional</span>
-                          <span className="received-zoom">⤢ Mărește</span>
-                        </a>
+                  <aside className="received-notes" aria-label={`Fotografia ${idx + 1} din ${photos.length}`}>
+                    <header className="received-notes-head">
+                      <a className="received-notes-thumb" href={photo.url} target="_blank" rel="noreferrer" title="Deschide fotografia">
+                        <img src={photo.url} alt="" />
+                        <span className="received-notes-thumb-num">{String(idx + 1).padStart(2, '0')}</span>
+                      </a>
+                      <div className="received-notes-heading">
+                        <div className="received-notes-title">Fotografia {idx + 1} din {photos.length}</div>
+                        <div className="received-notes-file">{photo.name}</div>
+                        <span className={`received-status ${status.cls}`}>{status.label}</span>
+                      </div>
+                    </header>
+
+                    <div className="received-notes-body">
+                      <div className="received-composer">
+                        <label className="received-composer-label" htmlFor={`note-${photo.id}`}>💬 OBSERVAȚIE</label>
+                        {photo.note && !photo.editing ? (
+                          <div className="received-comment">
+                            <div className="received-comment-text">{photo.note.text}</div>
+                            <div className="received-comment-time">
+                              {photo.note.edited ? 'Editată' : 'Trimisă'} {photo.note.at.toLocaleString('ro-RO', { dateStyle: 'short', timeStyle: 'short' })}
+                            </div>
+                          </div>
+                        ) : (
+                          <textarea
+                            id={`note-${photo.id}`}
+                            className="form-input received-textarea"
+                            placeholder="Ex: cerul puțin mai luminos, îndreaptă linia acoperișului..."
+                            value={photo.draft}
+                            onChange={e => updatePhoto(photo.id, { draft: e.target.value })}
+                          />
+                        )}
+                        <div className="received-comment-actions">
+                          {photo.editing ? (
+                            <>
+                              <button type="button" className="btn-secondary btn-sm" onClick={() => cancelEdit(photo.id)}>
+                                Anulează
+                              </button>
+                              <button
+                                type="button"
+                                className="btn-primary btn-sm"
+                                disabled={!photo.draft.trim()}
+                                onClick={() => saveNote(photo.id)}
+                              >
+                                ✓ Salvează modificarea
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              {photo.note ? (
+                                <button
+                                  type="button"
+                                  className="btn-secondary btn-sm"
+                                  disabled={photo.resent}
+                                  onClick={() => startEdit(photo.id)}
+                                >
+                                  ✎ Editează observația
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  className="btn-secondary btn-sm"
+                                  disabled={!photo.draft.trim()}
+                                  onClick={() => saveNote(photo.id)}
+                                >
+                                  Trimite observația
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                className="btn-resend btn-sm"
+                                disabled={photo.resent || (!photo.draft.trim() && !photo.note)}
+                                onClick={() => resend(photo.id)}
+                              >
+                                {photo.resent ? '✓ Retrimisă' : '↻ Retrimite la editare'}
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </div>
 
                       <div className="received-toolbar">
-                        <div className="reaction-group">
-                          <span className="received-toolbar-label">Evaluare</span>
+                        <div className="received-toolbar-label">EVALUEAZĂ ȘI DESCARCĂ</div>
+                        <div className="received-actions">
                           <button
                             type="button"
-                            className={`reaction-btn like ${photo.reaction === 'like' ? 'active' : ''}`}
+                            className={`received-action reaction-btn like ${photo.reaction === 'like' ? 'active' : ''}`}
                             onClick={() => toggleReaction(photo.id, 'like')}
                             aria-pressed={photo.reaction === 'like'}
                           >
-                            👍 Îmi place
+                            <span className="received-action-icon" aria-hidden="true">👍</span>
+                            <span>Îmi place</span>
                           </button>
                           <button
                             type="button"
-                            className={`reaction-btn dislike ${photo.reaction === 'dislike' ? 'active' : ''}`}
+                            className={`received-action reaction-btn dislike ${photo.reaction === 'dislike' ? 'active' : ''}`}
                             onClick={() => toggleReaction(photo.id, 'dislike')}
                             aria-pressed={photo.reaction === 'dislike'}
                           >
-                            👎 Nu îmi place
+                            <span className="received-action-icon" aria-hidden="true">👎</span>
+                            <span>Nu îmi place</span>
                           </button>
+                          <a className="received-action received-download" href={photo.url} download={photo.name}>
+                            <span className="received-action-icon" aria-hidden="true">⬇</span>
+                            <span>Descarcă</span>
+                          </a>
                         </div>
-                        <a className="btn-primary btn-sm received-download" href={photo.url} download={photo.name}>
-                          ⬇ Descarcă
-                        </a>
                       </div>
                     </div>
-
-                    <aside className="received-comments">
-                      <div className="received-comments-head">
-                        <span className="received-comments-title">💬 Observații</span>
-                        <span className="received-comments-count">{photo.comments.length}</span>
-                      </div>
-
-                      {photo.comments.length > 0 && (
-                        <div className="received-comment-list">
-                          {photo.comments.map((c, i) => (
-                            <div key={i} className="received-comment">
-                              <div className="received-comment-text">{c.text}</div>
-                              <div className="received-comment-time">
-                                {c.at.toLocaleString('ro-RO', { dateStyle: 'short', timeStyle: 'short' })}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      <div className={`received-composer ${photo.comments.length === 0 ? 'solo' : ''}`}>
-                        <textarea
-                          className="form-input received-textarea"
-                          placeholder="Ex: cerul puțin mai luminos, îndreaptă linia acoperișului..."
-                          value={photo.draft}
-                          onChange={e => updatePhoto(photo.id, { draft: e.target.value })}
-                        />
-                        <div className="received-comment-actions">
-                          <button
-                            type="button"
-                            className="btn-secondary btn-sm"
-                            disabled={!photo.draft.trim()}
-                            onClick={() => addComment(photo.id)}
-                          >
-                            Trimite observația
-                          </button>
-                          <button
-                            type="button"
-                            className="btn-resend btn-sm"
-                            disabled={photo.resent || (!photo.draft.trim() && photo.comments.length === 0)}
-                            onClick={() => resend(photo.id)}
-                          >
-                            {photo.resent ? '✓ Retrimisă' : '↻ Retrimite la editare'}
-                          </button>
-                        </div>
-                      </div>
-                    </aside>
-                  </div>
-                </article>
+                  </aside>
+                </div>
                 );
               })}
             </div>
